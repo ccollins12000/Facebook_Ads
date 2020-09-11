@@ -1,9 +1,9 @@
 import requests
-import BeautifulSoup from bs4
+from bs4 import BeautifulSoup
 
-params = {'q': 'Bill McRae Ford Lincoln'}
+params = {'q': 'Blossom Chevrolet'}
 r = requests.get('http://www.google.com/search', params = params)
 rtext = BeautifulSoup(r.text, 'html.parser')
 
-rtext.findAll('span', {'class': 'BNeawe tAd8D AP7Wnd'})
-rtext.findAll('span', {'class': 'BNeawe s3v9rd AP7Wnd'})    
+print(rtext.findAll('span', {'class': 'BNeawe tAd8D AP7Wnd'}))
+print(rtext.findAll('span', {'class': 'BNeawe s3v9rd AP7Wnd'})   )
