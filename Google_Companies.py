@@ -1,12 +1,12 @@
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
+import time
 
-searched = 'Blossom Chevrolet'
-
-params = {'q': searched}
-r = requests.get('http://www.google.com/search', params=params)
-r_html = BeautifulSoup(r.text, 'html.parser')
+def get_page(company_name):
+    params = {'q': company_name}
+    r = requests.get('http://www.google.com/search', params=params)
+    return BeautifulSoup(r.text, 'html.parser')
 
 
 def get_gresult_title(bs4_html):
@@ -38,9 +38,24 @@ def get_gattribute(bs4_html, fun):
         return ''
 
 
-print(pd.DataFrame(data={
-    'Searched': [searched],
-    'Title': [get_gresult_title(r_html)],
-    'Address: ': [get_gresult_address(r_html)],
-    'Phone: ': [get_gresult_phone(r_html)]
-}))
+company_list = pd.read_csv('company_list.csv')
+all_company_data = []
+
+for company in company_list.loc[:, 'Company']:
+    print(company)
+    try:
+        searched = get_page(company)
+        all_company_data.append(pd.DataFrame(data={
+            'Searched': [company],
+            'Title': [get_gattribute(searched, get_gresult_title)],
+            'Address: ': [get_gattribute(searched, get_gresult_address)],
+            'Phone: ': [get_gattribute(searched, get_gresult_phone)]
+        }))
+    except:
+        print(company, ' could not be retrieved')
+
+    time.sleep(.5)
+
+
+all_company_data = pd.concat(all_company_data, axis=0)
+all_company_data.to_csv('company_search_results.csv')
